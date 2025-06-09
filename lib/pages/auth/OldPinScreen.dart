@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_notes/pages/auth/ConfirmationPinScreen.dart';
 import 'package:flutter_notes/pages/auth/NewPinScreen.dart';
+import 'package:flutter_notes/utils/Constant.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
-class InputPinScreen extends StatefulWidget {
+class OldPinScreen extends StatefulWidget {
   @override
-  State<InputPinScreen> createState() => _InputPinScreenState();
+  State<OldPinScreen> createState() => _OldPinScreenState();
 }
 
-class _InputPinScreenState extends State<InputPinScreen> {
+class _OldPinScreenState extends State<OldPinScreen> {
   String pinValue = "";
 
   @override
@@ -35,7 +36,7 @@ class _InputPinScreenState extends State<InputPinScreen> {
           margin: const EdgeInsets.only(top: 50.0, bottom: 50.0),
           width: MediaQuery.of(context).size.width,
           child: Text(
-            "Buat PIN Anda",
+            "Masukkan PIN Lama Anda",
             style: TextStyle(
                 color: Colors.black,
                 fontSize: 16.0,
@@ -71,13 +72,16 @@ class _InputPinScreenState extends State<InputPinScreen> {
             animationDuration: Duration(milliseconds: 300),
             onChanged: (value) {},
             onCompleted: (value) {
-              pinValue = value;
-
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => NewPinScreen(pinValue),
-                  ));
+              if (value != getStringAsync(PIN)) {
+                Fluttertoast.showToast(msg: "PIN Lama Anda Salah");
+              } else {
+                pinValue = value;
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NewPinScreen(pinValue),
+                    ));
+              }
             },
           ),
         )

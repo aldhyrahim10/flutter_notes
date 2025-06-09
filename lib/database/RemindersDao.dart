@@ -3,9 +3,9 @@ import 'package:flutter_notes/database/DatabaseHelper.dart';
 import 'package:flutter_notes/models/Reminder.dart';
 
 class ReminderDao {
-  Future<void> insertReminder(Reminder reminder) async {
+  Future<int> insertReminder(Reminder reminder) async {
     final db = await DatabaseHelper.instance.database;
-    await db.insert('reminders', reminder.toMapForInsert());
+    return await db.insert('reminders', reminder.toMapForInsert());
   }
 
   Future<List<Reminder>> getAllReminders() async {
@@ -15,6 +15,19 @@ class ReminderDao {
     return List.generate(maps.length, (i) => Reminder.fromMap(maps[i]));
   }
 
+  Future<Reminder?> getReminderByNoteId(int noteId) async {
+    final db = await DatabaseHelper.instance.database;
+    final maps = await db.query(
+      'reminders',
+      where: 'note_id = ?',
+      whereArgs: [noteId],
+    );
+
+    if (maps.isNotEmpty) {
+      return Reminder.fromMap(maps.first);
+    }
+    return null;
+  }
 
   Future<void> updateReminder(Reminder reminder) async {
     final db = await DatabaseHelper.instance.database;

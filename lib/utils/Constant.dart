@@ -1,1 +1,2 @@
 const PIN = 'PIN';
+const BIOMETRIC_ENABLED = 'BIOMETRIC_ENABLED';

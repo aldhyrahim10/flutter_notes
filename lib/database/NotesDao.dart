@@ -2,7 +2,6 @@ import 'package:flutter_notes/database/DatabaseHelper.dart';
 import 'package:flutter_notes/models/Notes.dart';
 import 'package:sqflite/sqflite.dart';
 
-
 class NoteDao {
   Future<void> insertNote(Note note) async {
     final db = await DatabaseHelper.instance.database;
@@ -14,6 +13,22 @@ class NoteDao {
     final maps = await db.query('notes', orderBy: 'updated_date DESC');
 
     return List.generate(maps.length, (i) => Note.fromMap(maps[i]));
+  }
+
+  Future<Note?> getNoteById(int id) async {
+    final db = await DatabaseHelper.instance.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'notes',
+      where: 'id = ?',
+      whereArgs: [id],
+      limit: 1,
+    );
+
+    if (maps.isNotEmpty) {
+      return Note.fromMap(maps.first);
+    } else {
+      return null;
+    }
   }
 
   Future<void> updateNote(Note note) async {

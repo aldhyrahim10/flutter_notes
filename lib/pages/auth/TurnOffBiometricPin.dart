@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_notes/pages/auth/ConfirmationPinScreen.dart';
-import 'package:flutter_notes/pages/auth/NewPinScreen.dart';
+import 'package:flutter_notes/utils/Constant.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
-class InputPinScreen extends StatefulWidget {
+class ToggleBiometricPinScreen extends StatefulWidget {
+  bool isEnable;
+
+  ToggleBiometricPinScreen(this.isEnable);
+
   @override
-  State<InputPinScreen> createState() => _InputPinScreenState();
+  State<ToggleBiometricPinScreen> createState() =>
+      _ToggleBiometricPinScreenState();
 }
 
-class _InputPinScreenState extends State<InputPinScreen> {
+class _ToggleBiometricPinScreenState extends State<ToggleBiometricPinScreen> {
   String pinValue = "";
 
   @override
@@ -35,7 +41,7 @@ class _InputPinScreenState extends State<InputPinScreen> {
           margin: const EdgeInsets.only(top: 50.0, bottom: 50.0),
           width: MediaQuery.of(context).size.width,
           child: Text(
-            "Buat PIN Anda",
+            "Masukkan PIN Anda",
             style: TextStyle(
                 color: Colors.black,
                 fontSize: 16.0,
@@ -70,14 +76,22 @@ class _InputPinScreenState extends State<InputPinScreen> {
             ),
             animationDuration: Duration(milliseconds: 300),
             onChanged: (value) {},
-            onCompleted: (value) {
-              pinValue = value;
+            onCompleted: (value) async {
+              if (getStringAsync(PIN) != value) {
+                Fluttertoast.showToast(msg: "PIN Anda salah");
+              } else {
+                if (!widget.isEnable) {
+                  await setValue(BIOMETRIC_ENABLED, false);
 
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => NewPinScreen(pinValue),
-                  ));
+                  Fluttertoast.showToast(msg: "Biometric dimatikan");
+                  Navigator.of(context).pop();
+                } else {
+                  await setValue(BIOMETRIC_ENABLED, true);
+
+                  Fluttertoast.showToast(msg: "Biometric dinyalakan");
+                  Navigator.of(context).pop();
+                }
+              }
             },
           ),
         )

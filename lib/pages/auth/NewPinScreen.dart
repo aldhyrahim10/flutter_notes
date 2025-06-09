@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_notes/pages/auth/ConfirmationPinScreen.dart';
-import 'package:flutter_notes/pages/auth/NewPinScreen.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
-class InputPinScreen extends StatefulWidget {
+class NewPinScreen extends StatefulWidget {
+  String entryPin;
+
+  NewPinScreen(this.entryPin);
+
   @override
-  State<InputPinScreen> createState() => _InputPinScreenState();
+  State<NewPinScreen> createState() => _NewPinScreenState();
 }
 
-class _InputPinScreenState extends State<InputPinScreen> {
+class _NewPinScreenState extends State<NewPinScreen> {
   String pinValue = "";
 
   @override
@@ -35,7 +38,7 @@ class _InputPinScreenState extends State<InputPinScreen> {
           margin: const EdgeInsets.only(top: 50.0, bottom: 50.0),
           width: MediaQuery.of(context).size.width,
           child: Text(
-            "Buat PIN Anda",
+            "Masukkan PIN Baru Anda",
             style: TextStyle(
                 color: Colors.black,
                 fontSize: 16.0,
@@ -76,7 +79,7 @@ class _InputPinScreenState extends State<InputPinScreen> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => NewPinScreen(pinValue),
+                    builder: (context) => ConfirmationPinScreen(pinValue, true),
                   ));
             },
           ),

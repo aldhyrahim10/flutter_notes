@@ -24,15 +24,15 @@ void showNotification() async {
 
 void scheduleNotification() async {
   await flutterLocalNotificationsPlugin.zonedSchedule(
-    0, 
-    'Reminder', 
-    'Ini notifikasi terjadwal', 
+    0,
+    'Reminder',
+    'Ini notifikasi terjadwal',
     tz.TZDateTime.now(tz.local).add(Duration(seconds: 10)),
     NotificationDetails(
       android: AndroidNotificationDetails(
-        'channel_id', // ganti sesuai channel kamu
-        'channel_name',
-        channelDescription: 'Deskripsi channel',
+        'reminder_channel', // Sama seperti yang didefinisikan di atas
+        'Reminder Notifications',
+        channelDescription: 'Channel untuk notifikasi pengingat dari catatan',
         importance: Importance.max,
         priority: Priority.high,
       ),
@@ -41,6 +41,3 @@ void scheduleNotification() async {
     matchDateTimeComponents: DateTimeComponents.time,
   );
 }
-
-
-
