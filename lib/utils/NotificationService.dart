@@ -1,43 +1,42 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_notes/main.dart';
+import 'package:flutter_notes/models/Reminder.dart';
+import 'package:flutter_notes/utils/Permission.dart';
 import 'package:timezone/timezone.dart' as tz;
 
-void showNotification() async {
-  const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-    'channel_id',
-    'channel_name',
-    importance: Importance.max,
-    priority: Priority.high,
-  );
+Future<void> scheduleReminderNotifications(
+    Reminder reminder, String noteTitle, String noteContent) async {
+  await checkExactAlarmPermission(); // pastikan sudah ada izin exact alarm
 
-  const NotificationDetails platformDetails = NotificationDetails(
-    android: androidDetails,
-  );
+  for (int i = 0; i < reminder.notificationTimeReminder.length; i++) {
+    final offset = reminder.notificationTimeReminder[i];
+    final scheduledTime = reminder.dateTime.subtract(Duration(minutes: offset));
 
-  await flutterLocalNotificationsPlugin.show(
-    0,
-    'Notifikasi Judul',
-    'Isi Notifikasi',
-    platformDetails,
-  );
-}
+    if (scheduledTime.isAfter(DateTime.now())) {
+      final id = reminder.id! * 10 + i;
 
-void scheduleNotification() async {
-  await flutterLocalNotificationsPlugin.zonedSchedule(
-    0,
-    'Reminder',
-    'Ini notifikasi terjadwal',
-    tz.TZDateTime.now(tz.local).add(Duration(seconds: 10)),
-    NotificationDetails(
-      android: AndroidNotificationDetails(
-        'reminder_channel', // Sama seperti yang didefinisikan di atas
-        'Reminder Notifications',
-        channelDescription: 'Channel untuk notifikasi pengingat dari catatan',
-        importance: Importance.max,
-        priority: Priority.high,
-      ),
-    ),
-    androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-    matchDateTimeComponents: DateTimeComponents.time,
-  );
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        id,
+        noteTitle,
+        noteContent.length > 50
+            ? noteContent.substring(0, 50) + '...'
+            : noteContent,
+        tz.TZDateTime.from(scheduledTime, tz.local),
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'reminder_channel',
+            'Reminder Notifications',
+            channelDescription:
+                'Channel untuk notifikasi pengingat dari catatan',
+            importance: Importance.max,
+            priority: Priority.high,
+          ),
+        ),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+
+      print('Notifikasi dijadwalkan: $scheduledTime | ID: $id');
+    }
+  }
 }

@@ -5,6 +5,7 @@ import 'package:flutter_notes/database/NotesDao.dart';
 import 'package:flutter_notes/database/RemindersDao.dart';
 import 'package:flutter_notes/main.dart';
 import 'package:flutter_notes/models/Reminder.dart';
+import 'package:flutter_notes/utils/NotificationService.dart';
 import 'package:flutter_notes/utils/Permission.dart';
 import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -305,35 +306,33 @@ class _ModalNotificationState extends State<ModalNotification> {
       String noteTitle = note?.title ?? "Pengingat Catatan";
       String noteContent = note?.description ?? "Jangan lupa cek catatanmu!";
 
-      await checkExactAlarmPermission();
-      // Jadwalkan notifikasi untuk setiap waktu pengingat
-      for (int i = 0; i < reminderTimes.length; i++) {
-        int notificationId = reminderId * 10 + i;
-
-        await flutterLocalNotificationsPlugin.zonedSchedule(
-          notificationId,
-          noteTitle,
-          noteContent.length > 50
-              ? noteContent.substring(0, 50) + '...'
-              : noteContent,
-          tz.TZDateTime.from(reminderTimes[i], tz.local),
-          const NotificationDetails(
-            android: AndroidNotificationDetails(
-              'reminder_channel',
-              'Reminder Notifications',
-              channelDescription:
-                  'Channel untuk notifikasi pengingat dari catatan',
-              importance: Importance.max,
-              priority: Priority.high,
-            ),
-          ),
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          payload: widget.id.toString(),
+      void handleSimpanReminder(int noteID, DateTime selectedDateTime) async {
+        final reminder = Reminder(
+          noteID: noteID,
+          dateTime: selectedDateTime,
+          notificationTimeReminder: [0, 60, 180],
         );
-        print(
-            'Scheduled notification at: ${reminderTimes[i]} with ID: $notificationId');
+
+        // Simpan ke DB
+        final reminderWithId = Reminder(
+          id: reminderId,
+          noteID: reminder.noteID,
+          dateTime: reminder.dateTime,
+          notificationTimeReminder: reminder.notificationTimeReminder,
+        );
+
+        final noteDao = NoteDao();
+        final note = await noteDao.getNoteById(noteID);
+
+        await scheduleReminderNotifications(
+          reminderWithId,
+          note?.title ?? "Reminder Catatan",
+          note?.description ?? "Jangan lupa cek catatanmu!",
+        );
+
+        Fluttertoast.showToast(msg: "Reminder berhasil dijadwalkan");
       }
-      Fluttertoast.showToast(msg: "Berhasil menyimpan reminder");
+
       Navigator.of(context).pop();
     } catch (e) {
       Fluttertoast.showToast(msg: "Gagal menyimpan reminder");

@@ -73,6 +73,10 @@ class NotesListScreenState extends State<NotesListScreen> {
         child: Scaffold(
             appBar: AppBar(
               automaticallyImplyLeading: false,
+              leading: Container(
+                margin: const EdgeInsets.only(left: 20.0),
+                child: Image.asset('assets/img/logo-2.png'),
+              ),
               actions: [
                 IconButton(
                     onPressed: () {},

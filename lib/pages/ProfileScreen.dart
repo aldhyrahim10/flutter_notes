@@ -32,6 +32,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     fontWeight: FontWeight.w600,
                     color: Colors.black),
               ),
+              centerTitle: true,
             ),
             body: Padding(
               padding: const EdgeInsets.all(20.0),
